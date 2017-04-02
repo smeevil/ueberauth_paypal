@@ -34,10 +34,12 @@
 1.  Update your provider configuration:
 
     ```elixir
-    config :ueberauth, Ueberauth.Strategy.Paypal.OAuth,
-      client_id: System.get_env("PAYPAL_CLIENT_ID"),
-      client_secret: System.get_env("PAYPAL_CLIENT_SECRET"),
-      sandbox: false
+    config :ueberauth,
+      Ueberauth.Strategy.Paypal.OAuth, [
+        client_id: System.get_env("PAYPAL_CLIENT_ID"),
+        client_secret: System.get_env("PAYPAL_CLIENT_SECRET"),
+        sandbox: false
+      ]
     ```
     Note: the sandbox option, in your dev and test you might want to set this to true. The sandbox has different API credentials.
     

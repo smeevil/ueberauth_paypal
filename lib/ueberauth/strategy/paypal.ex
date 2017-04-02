@@ -74,12 +74,6 @@ defmodule Ueberauth.Strategy.Paypal do
 
   #privates
 
-  defp fetch_user(conn, token) do
-    token
-    |> OAuth2.AccessToken.get("/v1/identity/openidconnect/userinfo/?schema=openid")
-    |> handle_response(conn)
-  end
-
   defp handle_response({:ok, %OAuth2.Response{status_code: 401, body: _body}}, conn) do
     set_errors!(conn, [error("token", "unauthorized")])
   end
@@ -90,14 +84,15 @@ defmodule Ueberauth.Strategy.Paypal do
     set_errors!(conn, [error("OAuth2", reason)])
   end
 
-  defp handle_token(%{access_token: nil} = token, conn) do
+  defp handle_token(%OAuth2.Client{token: %{access_token: nil} = token} = client, conn) do
     err = token.other_params["error"]
     desc = token.other_params["error_description"]
     set_errors!(conn, [error(err, desc)])
   end
-  defp handle_token(token, conn) do
-    conn
-    |> put_private(:paypal_token, token)
-    |> fetch_user(token)
+  defp handle_token(%OAuth2.Client{token: token} = client, conn) do
+    conn = conn |> put_private(:paypal_token, token)
+
+    Ueberauth.Strategy.Paypal.OAuth.fetch_user(client)
+    |> handle_response(conn)
   end
 end

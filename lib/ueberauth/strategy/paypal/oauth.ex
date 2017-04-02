@@ -24,16 +24,17 @@ defmodule Ueberauth.Strategy.Paypal.OAuth do
   def scope, do: @defaults[:scope]
 
   def authorize_url!(params \\ [], opts \\ []) do
-    params = Keyword.merge([scope: scope], params)
+    params = Keyword.merge([scope: scope()], params)
     opts
     |> create_client
     |> OAuth2.Client.authorize_url!(params)
   end
 
   def get_token!(params \\ [], opts \\ []) do
+    auth = Application.get_env(:ueberauth, Ueberauth.Strategy.Paypal.OAuth) || []
     opts
     |> create_client
-    |> OAuth2.Client.get_token!(params)
+    |> OAuth2.Client.get_token!(params, [], [{:basic_auth, {auth[:client_id], auth[:client_secret]}}])
   end
 
   def authorize_url(client, params) do
@@ -44,6 +45,10 @@ defmodule Ueberauth.Strategy.Paypal.OAuth do
     client
     |> put_header("Accept", "application/json")
     |> OAuth2.Strategy.AuthCode.get_token(params, headers)
+  end
+
+  def fetch_user(%{token: %{access_token: access_token}}= client) do
+    OAuth2.Client.get(client, "/v1/identity/openidconnect/userinfo/?schema=openid")
   end
 
   defp set_sandbox_if_needed(options) do
