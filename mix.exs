@@ -25,7 +25,8 @@ defmodule UeberauthPaypal.Mixfile do
   defp deps do
     [
       {:oauth2, "~> 0.9.1"},
-      {:ueberauth, "~> 0.4.0"}
+      {:ueberauth, "~> 0.4.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 
