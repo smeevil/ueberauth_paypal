@@ -10,7 +10,7 @@
 
     ```elixir
     def deps do
-      [{:ueberauth_paypal, "~> 0.1"}]
+      [{:ueberauth_paypal, "~> 0.2.0"}]
     end
     ```
 
